@@ -4,14 +4,15 @@ using System.Collections.Generic;
 
 public class KeplerOrchestrator : MonoBehaviour
 {
+    private const double G = 6.67430e-11; // Gravitational constant
     private const double CELESTIAL_SCALE_FACTOR = 1e7;
     private const double AU = 149597870.7; // Astronomical Unit in km
 
-    [SerializeField] private float timeScale = 1f;
+    [SerializeField] public float timeScale = 1f;
 
     // Art style scale factors
     public float planetSizeScale = 100f;
-    public float moonSizeScale = 200f;
+    public float moonSizeScale = 100f;
     public float planetOrbitScale = 1f;
     public float moonOrbitScale = 1f;
     public float solarScale = 1f;
@@ -20,7 +21,7 @@ public class KeplerOrchestrator : MonoBehaviour
 
     void Start()
     {
-        InitializeSolarSystem();
+        InitializeCustomSystem();
         CreateGameObjects();
     }
 
@@ -29,238 +30,83 @@ public class KeplerOrchestrator : MonoBehaviour
         UpdatePositions(Time.time * timeScale);
     }
 
-    private void InitializeSolarSystem()
+    private void InitializeCustomSystem()
     {
-        // Sun (fixed at the center)
-        var sun = AddBody(new CelestialBody
+        // Central star
+        var centralStar = AddBody(new CelestialBody
         {
-            Name = "Sun",
+            Name = "Central Star",
             Radius = 696340 / CELESTIAL_SCALE_FACTOR * solarScale,
             Mass = 1.989e30,
             ColorHex = "#FFD700",
             IsPlanet = true
         });
 
-        // Mercury
-        AddBody(new CelestialBody
+        // Planet 1
+        var planet1 = AddBody(new CelestialBody
         {
-            Name = "Mercury",
-            Radius = 2439.7 / CELESTIAL_SCALE_FACTOR,
-            Mass = 3.285e23,
-            ColorHex = "#A0522D",
-            Orbit = new KeplerOrbit(0.387 * AU / CELESTIAL_SCALE_FACTOR, 0.206, 88),
-            Parent = sun,
-            IsPlanet = true
-        });
-
-        // Venus
-        AddBody(new CelestialBody
-        {
-            Name = "Venus",
-            Radius = 6051.8 / CELESTIAL_SCALE_FACTOR,
-            Mass = 4.867e24,
-            ColorHex = "#DEB887",
-            Orbit = new KeplerOrbit(0.723 * AU / CELESTIAL_SCALE_FACTOR, 0.007, 224.7),
-            Parent = sun,
-            IsPlanet = true
-        });
-
-        // Earth
-        var earth = AddBody(new CelestialBody
-        {
-            Name = "Earth",
+            Name = "Planet 1",
             Radius = 6371 / CELESTIAL_SCALE_FACTOR,
             Mass = 5.972e24,
             ColorHex = "#4169E1",
-            Orbit = new KeplerOrbit(AU / CELESTIAL_SCALE_FACTOR, 0.0167, 365.25),
-            Parent = sun,
+            OrbitRadius = 1.5 * AU / CELESTIAL_SCALE_FACTOR,
+            Eccentricity = 0.01,
+            Parent = centralStar,
             IsPlanet = true
         });
 
-        // Moon
+        // Moon of Planet 1
         AddBody(new CelestialBody
         {
-            Name = "Moon",
+            Name = "Moon 1",
             Radius = 1737.1 / CELESTIAL_SCALE_FACTOR,
             Mass = 7.342e22,
             ColorHex = "#A9A9A9",
-            Orbit = new KeplerOrbit(384399 / CELESTIAL_SCALE_FACTOR, 0.0549, 27.322),
-            Parent = earth,
+            OrbitRadius = 200000 / CELESTIAL_SCALE_FACTOR,
+            Eccentricity = 0.0549,
+            Parent = planet1,
             IsPlanet = false
         });
 
-        // Mars
-        var mars = AddBody(new CelestialBody
+        // Planet 2
+        var planet2 = AddBody(new CelestialBody
         {
-            Name = "Mars",
-            Radius = 3389.5 / CELESTIAL_SCALE_FACTOR,
-            Mass = 6.39e23,
-            ColorHex = "#CD5C5C",
-            Orbit = new KeplerOrbit(1.524 * AU / CELESTIAL_SCALE_FACTOR, 0.0934, 687),
-            Parent = sun,
-            IsPlanet = true
-        });
-
-        // Mars' moons
-        AddBody(new CelestialBody
-        {
-            Name = "Phobos",
-            Radius = 11.267 / CELESTIAL_SCALE_FACTOR,
-            Mass = 1.0659e16,
-            ColorHex = "#8B4513",
-            Orbit = new KeplerOrbit(9377 / CELESTIAL_SCALE_FACTOR, 0.0151, 0.319),
-            Parent = mars,
-            IsPlanet = false
-        });
-
-        AddBody(new CelestialBody
-        {
-            Name = "Deimos",
-            Radius = 6.2 / CELESTIAL_SCALE_FACTOR,
-            Mass = 1.4762e15,
-            ColorHex = "#A0522D",
-            Orbit = new KeplerOrbit(23460 / CELESTIAL_SCALE_FACTOR, 0.00033, 1.262),
-            Parent = mars,
-            IsPlanet = false
-        });
-
-        // Jupiter
-        var jupiter = AddBody(new CelestialBody
-        {
-            Name = "Jupiter",
+            Name = "Planet 2",
             Radius = 69911 / CELESTIAL_SCALE_FACTOR,
             Mass = 1.898e27,
             ColorHex = "#DEB887",
-            Orbit = new KeplerOrbit(5.203 * AU / CELESTIAL_SCALE_FACTOR, 0.0489, 4333),
-            Parent = sun,
+            OrbitRadius = 3.5 * AU / CELESTIAL_SCALE_FACTOR,
+            Eccentricity = 0.0489,
+            Parent = centralStar,
             IsPlanet = true
         });
 
-        // Jupiter's major moons
+        // Moons of Planet 2
         AddBody(new CelestialBody
         {
-            Name = "Io",
+            Name = "Moon 2A",
             Radius = 1821.6 / CELESTIAL_SCALE_FACTOR,
             Mass = 8.931e22,
             ColorHex = "#FFD700",
-            Orbit = new KeplerOrbit(421700 / CELESTIAL_SCALE_FACTOR, 0.0041, 1.769),
-            Parent = jupiter,
+            OrbitRadius = 600000 / CELESTIAL_SCALE_FACTOR,
+            Eccentricity = 0.0041,
+            Parent = planet2,
             IsPlanet = false
         });
 
         AddBody(new CelestialBody
         {
-            Name = "Europa",
-            Radius = 1560.8 / CELESTIAL_SCALE_FACTOR,
-            Mass = 4.799e22,
-            ColorHex = "#F5F5DC",
-            Orbit = new KeplerOrbit(671100 / CELESTIAL_SCALE_FACTOR, 0.009, 3.551),
-            Parent = jupiter,
-            IsPlanet = false
-        });
-
-        AddBody(new CelestialBody
-        {
-            Name = "Ganymede",
+            Name = "Moon 2B",
             Radius = 2634.1 / CELESTIAL_SCALE_FACTOR,
             Mass = 1.482e23,
             ColorHex = "#808080",
-            Orbit = new KeplerOrbit(1070400 / CELESTIAL_SCALE_FACTOR, 0.0013, 7.154),
-            Parent = jupiter,
+            OrbitRadius = 1370400 / CELESTIAL_SCALE_FACTOR,
+            Eccentricity = 0.0013,
+            Parent = planet2,
             IsPlanet = false
         });
 
-        AddBody(new CelestialBody
-        {
-            Name = "Callisto",
-            Radius = 2410.3 / CELESTIAL_SCALE_FACTOR,
-            Mass = 1.076e23,
-            ColorHex = "#696969",
-            Orbit = new KeplerOrbit(1882700 / CELESTIAL_SCALE_FACTOR, 0.0074, 16.689),
-            Parent = jupiter,
-            IsPlanet = false
-        });
-
-        // Saturn
-        var saturn = AddBody(new CelestialBody
-        {
-            Name = "Saturn",
-            Radius = 58232 / CELESTIAL_SCALE_FACTOR,
-            Mass = 5.683e26,
-            ColorHex = "#F4A460",
-            Orbit = new KeplerOrbit(9.537 * AU / CELESTIAL_SCALE_FACTOR, 0.0565, 10759),
-            Parent = sun,
-            IsPlanet = true
-        });
-
-        // Saturn's major moons
-        AddBody(new CelestialBody
-        {
-            Name = "Titan",
-            Radius = 2574.73 / CELESTIAL_SCALE_FACTOR,
-            Mass = 1.345e23,
-            ColorHex = "#DAA520",
-            Orbit = new KeplerOrbit(1221870 / CELESTIAL_SCALE_FACTOR, 0.0288, 15.945),
-            Parent = saturn,
-            IsPlanet = false
-        });
-
-        AddBody(new CelestialBody
-        {
-            Name = "Rhea",
-            Radius = 763.8 / CELESTIAL_SCALE_FACTOR,
-            Mass = 2.306e21,
-            ColorHex = "#D3D3D3",
-            Orbit = new KeplerOrbit(527108 / CELESTIAL_SCALE_FACTOR, 0.001, 4.518),
-            Parent = saturn,
-            IsPlanet = false
-        });
-
-        AddBody(new CelestialBody
-        {
-            Name = "Iapetus",
-            Radius = 734.5 / CELESTIAL_SCALE_FACTOR,
-            Mass = 1.805e21,
-            ColorHex = "#8B4513",
-            Orbit = new KeplerOrbit(3560820 / CELESTIAL_SCALE_FACTOR, 0.0286, 79.322),
-            Parent = saturn,
-            IsPlanet = false
-        });
-
-        // Uranus
-        var uranus = AddBody(new CelestialBody
-        {
-            Name = "Uranus",
-            Radius = 25362 / CELESTIAL_SCALE_FACTOR,
-            Mass = 8.681e25,
-            ColorHex = "#00CED1",
-            Orbit = new KeplerOrbit(19.191 * AU / CELESTIAL_SCALE_FACTOR, 0.0472, 30688.5),
-            Parent = sun,
-            IsPlanet = true
-        });
-
-        // Uranus' major moons
-        AddBody(new CelestialBody
-        {
-            Name = "Titania",
-            Radius = 788.9 / CELESTIAL_SCALE_FACTOR,
-            Mass = 3.42e21,
-            ColorHex = "#A9A9A9",
-            Orbit = new KeplerOrbit(435910 / CELESTIAL_SCALE_FACTOR, 0.0011, 8.706),
-            Parent = uranus,
-            IsPlanet = false
-        });
-
-        AddBody(new CelestialBody
-        {
-            Name = "Oberon",
-            Radius = 761.4 / CELESTIAL_SCALE_FACTOR,
-            Mass = 2.88e21,
-            ColorHex = "#8B4513",
-            Orbit = new KeplerOrbit(583520 / CELESTIAL_SCALE_FACTOR, 0.0014, 13.463),
-            Parent = uranus,
-            IsPlanet = false
-        });
+        // Add more planets and moons as needed
     }
 
     private CelestialBody AddBody(CelestialBody body)
@@ -269,8 +115,17 @@ public class KeplerOrchestrator : MonoBehaviour
         if (body.Parent != null)
         {
             body.Parent.Satellites.Add(body);
+            body.Orbit = new KeplerOrbit(body.OrbitRadius, body.Eccentricity, CalculateOrbitalPeriod(body));
         }
         return body;
+    }
+
+    private double CalculateOrbitalPeriod(CelestialBody body)
+    {
+        // Using Kepler's Third Law
+        double a = body.OrbitRadius * CELESTIAL_SCALE_FACTOR; // Convert back to meters
+        double M = body.Parent.Mass;
+        return 2 * Math.PI * Math.Sqrt(a * a * a / (G * M)) / (24 * 3600); // Convert to days
     }
 
     private void CreateGameObjects()
@@ -294,8 +149,9 @@ public class KeplerOrchestrator : MonoBehaviour
             }
 
             float scale = body.IsPlanet ?
-                (float)(body.Radius * 2 * planetSizeScale) :
-                (float)(body.Radius * 2 * moonSizeScale);
+                            (float)(body.Radius * 2 * planetSizeScale) :
+                            (float)(body.Radius * 2 * moonSizeScale);
+
             body.GameObject.transform.localScale = new Vector3(scale, scale, scale);
 
             body.GameObject.transform.SetParent(transform, false);
@@ -306,7 +162,7 @@ public class KeplerOrchestrator : MonoBehaviour
     {
         foreach (var body in celestialBodies)
         {
-            if (body.Orbit == null) continue; // Skip the Sun
+            if (body.Orbit == null) continue; // Skip the central star
 
             Vector3 position = body.Orbit.GetPosition(timeSeconds, body.IsPlanet ? planetOrbitScale : moonOrbitScale);
 
@@ -318,6 +174,29 @@ public class KeplerOrchestrator : MonoBehaviour
             body.GameObject.transform.position = position;
         }
     }
+
+    public List<CelestialBody> GetCelestialBodies()
+    {
+        return celestialBodies;
+    }
+
+    public Vector3 GetCelestialBodyPosition(CelestialBody body, float time)
+    {
+        if (body.Orbit == null)
+        {
+            // This is the central star, return its fixed position
+            return body.GameObject.transform.position;
+        }
+
+        Vector3 position = body.Orbit.GetPosition(time, body.IsPlanet ? planetOrbitScale : moonOrbitScale);
+
+        if (body.Parent != null)
+        {
+            position += GetCelestialBodyPosition(body.Parent, time);
+        }
+
+        return position;
+    }
 }
 
 public class CelestialBody
@@ -326,11 +205,18 @@ public class CelestialBody
     public double Radius { get; set; } // in km (scaled)
     public double Mass { get; set; } // in kg
     public string ColorHex { get; set; }
+    public double OrbitRadius { get; set; } // in km (scaled)
+    public double Eccentricity { get; set; }
     public KeplerOrbit Orbit { get; set; }
     public GameObject GameObject { get; set; }
     public CelestialBody Parent { get; set; }
     public List<CelestialBody> Satellites { get; set; } = new List<CelestialBody>();
     public bool IsPlanet { get; set; }
+
+    public Vector3 GetPosition(float time, KeplerOrchestrator orchestrator)
+    {
+        return orchestrator.GetCelestialBodyPosition(this, time);
+    }
 }
 
 public class KeplerOrbit
@@ -365,5 +251,10 @@ public class KeplerOrbit
             E = E - (E - eccentricity * Math.Sin(E) - M) / (1 - eccentricity * Math.Cos(E));
         }
         return E;
+    }
+
+    public Vector3 GetPosition(double timeSeconds)
+    {
+        return GetPosition(timeSeconds, 1f);
     }
 }
