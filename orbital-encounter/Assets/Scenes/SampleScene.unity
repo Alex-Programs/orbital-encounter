@@ -5130,6 +5130,50 @@ MonoBehaviour:
     m_MipBias: 0
     m_VarianceClampScale: 0.9
     m_ContrastAdaptiveSharpening: 0
+--- !u!1 &374144521
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 374144523}
+  - component: {fileID: 374144522}
+  m_Layer: 0
+  m_Name: CelestialTimeService
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &374144522
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 374144521}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8cb60b49d9a074eee8ab0b0b4c5fae0e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!4 &374144523
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 374144521}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 19.122889, y: 4.3544946, z: 2.3439107}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &410087039
 GameObject:
   m_ObjectHideFlags: 0
@@ -5251,6 +5295,55 @@ MonoBehaviour:
   m_LightCookieSize: {x: 1, y: 1}
   m_LightCookieOffset: {x: 0, y: 0}
   m_SoftShadowQuality: 1
+--- !u!1 &871080491
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 871080493}
+  - component: {fileID: 871080492}
+  m_Layer: 0
+  m_Name: KeplerPredictor
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &871080492
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 871080491}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a3c2317f7a3c6d129996784185af473a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  planetaryScale: 1
+  lunarScale: 1
+  orbitScale: 1
+  speedScale: 0.1
+  bodies: []
+--- !u!4 &871080493
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 871080491}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 19.122889, y: 4.3544946, z: 2.3439107}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &965098681
 GameObject:
   m_ObjectHideFlags: 0
@@ -10105,7 +10198,6 @@ GameObject:
   - component: {fileID: 1099245147}
   - component: {fileID: 1099245146}
   - component: {fileID: 1099245145}
-  - component: {fileID: 1099245144}
   m_Layer: 0
   m_Name: TempShip
   m_TagString: Untagged
@@ -10113,21 +10205,6 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!114 &1099245144
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1099245143}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 143389387175e5f6084ae51a9ff63e02, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  predictor: {fileID: 1391276859}
-  initialSpeed: 0
-  mass: 1
 --- !u!136 &1099245145
 CapsuleCollider:
   m_ObjectHideFlags: 0
@@ -10341,54 +10418,6 @@ MonoBehaviour:
   debugLog: 0
   statisticsGUI: 0
   statisticsLog: 0
---- !u!1 &1391276858
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 1391276860}
-  - component: {fileID: 1391276859}
-  m_Layer: 0
-  m_Name: NBodyPredictor
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!114 &1391276859
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1391276858}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: e5c7648864869c4fd85d0dc79e0e5f72, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  keplerOrchestrator: {fileID: 2045489591}
-  predictionSteps: 5000
-  timestep: 1
-  minGravityThreshold: 0.01
---- !u!4 &1391276860
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1391276858}
-  serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -77.01646, y: -4.058664, z: 82.42008}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 0}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &2045489589
 GameObject:
   m_ObjectHideFlags: 0
@@ -10433,12 +10462,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a77f0ca303e6126d7baaf5508376b429, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  timeScale: 1
-  planetSizeScale: 300
-  moonSizeScale: 500
-  planetOrbitScale: 1
-  moonOrbitScale: 80
-  solarScale: 0.2
+  keplerPredictor: {fileID: 871080492}
+  timeService: {fileID: 374144522}
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0
@@ -10447,7 +10472,8 @@ SceneRoots:
   - {fileID: 410087041}
   - {fileID: 1115447027}
   - {fileID: 188465595}
-  - {fileID: 1391276860}
   - {fileID: 1099245148}
   - {fileID: 965098684}
   - {fileID: 89989106}
+  - {fileID: 871080493}
+  - {fileID: 374144523}
