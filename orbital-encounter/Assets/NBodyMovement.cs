@@ -8,7 +8,6 @@ public class NBodyMovement : MonoBehaviour
 
     private int trackId = -1;
     private bool isInitialized = false;
-    private float elapsedTime = 0f;
 
     void Start()
     {
@@ -26,8 +25,6 @@ public class NBodyMovement : MonoBehaviour
     void Update()
     {
         if (!isInitialized) return;
-
-        elapsedTime += Time.deltaTime;
 
         var (position, velocity) = predictor.GetTrackCurrent(trackId);
         transform.position = position;

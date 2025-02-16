@@ -2,89 +2,61 @@ using UnityEngine;
 using System;
 using System.Collections.Generic;
 
-// A simple double‑precision vector.
 public struct Vector3d
 {
     public double x, y, z;
-    public Vector3d(double x, double y, double z)
-    {
-        this.x = x; this.y = y; this.z = z;
-    }
-    public double Magnitude()
-    {
-        return Math.Sqrt(x * x + y * y + z * z);
-    }
+    public Vector3d(double x, double y, double z) { this.x = x; this.y = y; this.z = z; }
+    public double Magnitude() => Math.Sqrt(x * x + y * y + z * z);
     public Vector3d Normalized()
     {
-        double m = Magnitude();
-        return m > 0 ? new Vector3d(x / m, y / m, z / m) : new Vector3d(0, 0, 0);
+        double mag = Magnitude();
+        return mag > 0 ? new Vector3d(x / mag, y / mag, z / mag) : new Vector3d(0, 0, 0);
     }
-    public static Vector3d operator +(Vector3d a, Vector3d b)
-    {
-        return new Vector3d(a.x + b.x, a.y + b.y, a.z + b.z);
-    }
-    public static Vector3d operator -(Vector3d a, Vector3d b)
-    {
-        return new Vector3d(a.x - b.x, a.y - b.y, a.z - b.z);
-    }
-    public static Vector3d operator *(Vector3d a, double d)
-    {
-        return new Vector3d(a.x * d, a.y * d, a.z * d);
-    }
-    public static Vector3d operator /(Vector3d a, double d)
-    {
-        return new Vector3d(a.x / d, a.y / d, a.z / d);
-    }
-    public Vector3 ToVector3()
-    {
-        return new Vector3((float)x, (float)y, (float)z);
-    }
-}
-
-// Track stores simulation state in double‐precision.
-public class NBodyTrack
-{
-    public List<double> Times { get; private set; }
-    public List<Vector3d> Positions { get; private set; }
-    public List<Vector3d> Velocities { get; private set; }
-    public double Mass { get; private set; }
-
-    public NBodyTrack(Vector3 initialPosition, Vector3 initialVelocity, float mass, int capacity, double initialTime)
-    {
-        // Reserve capacity+1 for the initial sample.
-        Times = new List<double>(capacity + 1) { initialTime };
-        Positions = new List<Vector3d>(capacity + 1) { new Vector3d(initialPosition.x, initialPosition.y, initialPosition.z) };
-        Velocities = new List<Vector3d>(capacity + 1) { new Vector3d(initialVelocity.x, initialVelocity.y, initialVelocity.z) };
-        Mass = mass;
-    }
+    public static Vector3d operator +(Vector3d a, Vector3d b) => new Vector3d(a.x + b.x, a.y + b.y, a.z + b.z);
+    public static Vector3d operator -(Vector3d a, Vector3d b) => new Vector3d(a.x - b.x, a.y - b.y, a.z - b.z);
+    public static Vector3d operator *(Vector3d a, double d) => new Vector3d(a.x * d, a.y * d, a.z * d);
+    public static Vector3d operator *(double d, Vector3d a) => a * d;
+    public static Vector3d operator /(Vector3d a, double d) => new Vector3d(a.x / d, a.y / d, a.z / d);
+    public Vector3 ToVector3() => new Vector3((float)x, (float)y, (float)z);
 }
 
 public class NBodyPredictor : MonoBehaviour
 {
-    public KeplerOrchestrator keplerOrchestrator; // Must have public timeScale
+    public KeplerOrchestrator keplerOrchestrator;
     public int predictionSteps = 50000;
-    public float timestep = 0.01f; // Simulation seconds
-    public float minGravityThreshold = 0.01f;
+    public float timestep = 0.01f;
+    public float minGravityThreshold = 01f;
+    private const double G = 10000000000000000;
 
-    private Dictionary<int, NBodyTrack> tracks = new Dictionary<int, NBodyTrack>();
+    // Internal storage for predicted trajectories.
+    private class TrackData
+    {
+        public float mass;
+        public List<double> times;
+        public List<Vector3d> positions;
+        public List<Vector3d> velocities;
+        public TrackData(Vector3 initialPosition, Vector3 initialVelocity, float mass, double startTime, int capacity)
+        {
+            this.mass = mass;
+            times = new List<double>(capacity + 1) { startTime };
+            positions = new List<Vector3d>(capacity + 1) { new Vector3d(initialPosition.x, initialPosition.y, initialPosition.z) };
+            velocities = new List<Vector3d>(capacity + 1) { new Vector3d(initialVelocity.x, initialVelocity.y, initialVelocity.z) };
+        }
+    }
+
+    private Dictionary<int, TrackData> tracks = new Dictionary<int, TrackData>();
     private int nextTrackId = 0;
-    private double accumulatedSimTime = 0.0; // In simulation seconds
-
-    // Use a double‑precision gravitational constant in game units.
-    private const double G = 1000000.0;
+    private double accumulatedSimTime = 0.0;
 
     void Update()
     {
         if (keplerOrchestrator == null)
             return;
 
-        // Use the orchestrator's timeScale so simulation time = Time.time * timeScale.
         accumulatedSimTime += Time.deltaTime * keplerOrchestrator.timeScale;
-        int stepsToTake = (int)Math.Floor(accumulatedSimTime / timestep);
-        for (int i = 0; i < stepsToTake; i++)
-        {
+        int steps = (int)Math.Floor(accumulatedSimTime / timestep);
+        for (int i = 0; i < steps; i++)
             UpdateTracks();
-        }
         accumulatedSimTime %= timestep;
     }
 
@@ -93,11 +65,11 @@ public class NBodyPredictor : MonoBehaviour
         if (keplerOrchestrator == null)
             return -1;
         double simTime = Time.time * keplerOrchestrator.timeScale;
-        int trackId = nextTrackId++;
-        NBodyTrack track = new NBodyTrack(position, velocity, mass, predictionSteps, simTime);
-        tracks[trackId] = track;
-        PredictTrack(track);
-        return trackId;
+        int id = nextTrackId++;
+        var track = new TrackData(position, velocity, mass, simTime, predictionSteps);
+        SimulatePrediction(track, predictionSteps);
+        tracks[id] = track;
+        return id;
     }
 
     public void RemoveTrack(int trackId)
@@ -105,103 +77,104 @@ public class NBodyPredictor : MonoBehaviour
         tracks.Remove(trackId);
     }
 
-    // Returns a list of (time, position, velocity) samples converting double→float.
     public List<(float time, Vector3 position, Vector3 velocity)> GetTrack(int trackId, float resolution)
     {
-        if (!tracks.TryGetValue(trackId, out NBodyTrack track))
+        var result = new List<(float, Vector3, Vector3)>();
+        if (!tracks.TryGetValue(trackId, out var track))
         {
             Debug.LogWarning($"Track with ID {trackId} not found.");
-            return new List<(float, Vector3, Vector3)>();
+            return result;
         }
-
-        List<(float time, Vector3 position, Vector3 velocity)> result =
-            new List<(float time, Vector3 position, Vector3 velocity)>();
-        int stepsBetweenSamples = Mathf.Max(1, Mathf.RoundToInt(resolution / timestep));
-
-        for (int i = 0; i < track.Times.Count; i += stepsBetweenSamples)
-        {
-            result.Add(((float)track.Times[i], track.Positions[i].ToVector3(), track.Velocities[i].ToVector3()));
-        }
+        int stepInterval = Mathf.Max(1, Mathf.RoundToInt(resolution / timestep));
+        for (int i = 0; i < track.times.Count; i += stepInterval)
+            result.Add(((float)track.times[i], track.positions[i].ToVector3(), track.velocities[i].ToVector3()));
         return result;
     }
 
     public (Vector3 position, Vector3 velocity) GetTrackCurrent(int trackId)
     {
-        tracks.TryGetValue(trackId, out NBodyTrack track);
-
-        return (track.Positions[0].ToVector3(), track.Velocities[0].ToVector3());
+        if (tracks.TryGetValue(trackId, out var track))
+            return (track.positions[0].ToVector3(), track.velocities[0].ToVector3());
+        return (Vector3.zero, Vector3.zero);
     }
 
-    // Advances each track one simulation step.
+    // Advances each track one timestep using Velocity Verlet integration.
     private void UpdateTracks()
     {
-        foreach (var track in tracks.Values)
+        foreach (var kvp in tracks)
         {
-            for (int i = 0; i < track.Positions.Count; i++)
+            var track = kvp.Value;
+            // Discard the oldest sample.
+            // Discard only if there's more than one sample
+            if (track.times.Count > 1)
             {
-                Debug.Log($"Track position {i}: {track.Positions[i].ToVector3()}");
+                track.times.RemoveAt(0);
+                track.positions.RemoveAt(0);
+                track.velocities.RemoveAt(0);
             }
-            // Remove oldest sample.
-            track.Times.RemoveAt(0);
-            track.Positions.RemoveAt(0);
-            track.Velocities.RemoveAt(0);
 
-            double newTime = track.Times[track.Times.Count - 1] + timestep;
-            Vector3d lastPos = track.Positions[track.Positions.Count - 1];
-            Vector3d lastVel = track.Velocities[track.Velocities.Count - 1];
+            int last = track.times.Count - 1;
+            double t = track.times[last];
+            Vector3d x = track.positions[last];
+            Vector3d v = track.velocities[last];
 
-            Vector3d totalForce = CalculateTotalForce(lastPos, track.Mass, newTime);
-            Vector3d acceleration = totalForce / track.Mass;
-            Vector3d newVel = lastVel + acceleration * timestep;
-            Vector3d newPos = lastPos + newVel * timestep;
+            Vector3d a = ComputeAcceleration(x, t);
+            Debug.Log($"Acceleration: {a.x}, {a.y}, {a.z}");
 
-            track.Times.Add(newTime);
-            track.Velocities.Add(newVel);
-            track.Positions.Add(newPos);
+            Vector3d xNew = x + v * timestep + a * (0.5 * timestep * timestep);
+            double tNew = t + timestep;
+            Vector3d aNew = ComputeAcceleration(xNew, tNew);
+            Vector3d vNew = v + (a + aNew) * (0.5 * timestep);
+
+            Debug.Log($"Ship Pos: {xNew.x}, {xNew.y}, {xNew.z}");
+
+            track.times.Add(tNew);
+            track.positions.Add(xNew);
+            track.velocities.Add(vNew);
         }
     }
 
-    // Predicts an entire track from the current state.
-    private void PredictTrack(NBodyTrack track)
+    // Precomputes a predicted trajectory using Velocity Verlet.
+    private void SimulatePrediction(TrackData track, int steps)
     {
-        double simTime = track.Times[0];
-        Vector3d pos = track.Positions[0];
-        Vector3d vel = track.Velocities[0];
-
-        for (int i = 0; i < predictionSteps; i++)
+        for (int i = 0; i < steps; i++)
         {
-            simTime += timestep;
-            Debug.Log($"Sim time: {simTime}");
-            Vector3d totalForce = CalculateTotalForce(pos, track.Mass, simTime);
-            Vector3d acceleration = totalForce / track.Mass;
-            vel += acceleration * timestep;
-            pos += vel * timestep;
+            int last = track.times.Count - 1;
+            double t = track.times[last];
+            Vector3d x = track.positions[last];
+            Vector3d v = track.velocities[last];
 
-            track.Times.Add(simTime);
-            track.Velocities.Add(vel);
-            track.Positions.Add(pos);
+            Vector3d a = ComputeAcceleration(x, t);
+            Debug.Log($"Acceleration: {a.x}, {a.y}, {a.z}");
+            Vector3d xNew = x + v * timestep + a * (0.5 * timestep * timestep);
+            double tNew = t + timestep;
+            Vector3d aNew = ComputeAcceleration(xNew, tNew);
+            Vector3d vNew = v + (a + aNew) * (0.5 * timestep);
+
+            Debug.Log($"Ship Pos: {xNew.x}, {xNew.y}, {xNew.z}");
+
+            track.times.Add(tNew);
+            track.positions.Add(xNew);
+            track.velocities.Add(vNew);
         }
     }
 
-    // Computes the total gravitational force at a given simulation time.
-    private Vector3d CalculateTotalForce(Vector3d position, double mass, double simTime)
+    // Computes gravitational acceleration at a given position and simulation time.
+    private Vector3d ComputeAcceleration(Vector3d position, double simTime)
     {
-        Vector3d totalForce = new Vector3d(0, 0, 0);
-        foreach (var celestialBody in keplerOrchestrator.GetCelestialBodies())
+        Vector3d acc = new Vector3d(0, 0, 0);
+        foreach (var body in keplerOrchestrator.GetCelestialBodies())
         {
-            // Get the body's position (in float) at simTime then convert to double.
-            Vector3 bodyPosF = celestialBody.GetPosition((float)simTime, keplerOrchestrator);
+            Vector3 bodyPosF = body.GetPosition((float)simTime, keplerOrchestrator);
             Vector3d bodyPos = new Vector3d(bodyPosF.x, bodyPosF.y, bodyPosF.z);
-            Vector3d dir = bodyPos - position;
-            double dist = dir.Magnitude();
-            Debug.Log($"Distance: {dist}");
-            if (dist < 0.001)
+            Vector3d diff = bodyPos - position;
+            double r = diff.Magnitude();
+            Vector3d dir = diff.Normalized();
+            double aMag = G * body.Mass / (r * r);
+            if (aMag < minGravityThreshold)
                 continue;
-            Vector3d normDir = dir.Normalized();
-            double forceMagnitude = G * mass * celestialBody.Mass / (dist * dist);
-            if (forceMagnitude > minGravityThreshold)
-                totalForce += normDir * forceMagnitude;
+            acc += dir * aMag;
         }
-        return totalForce;
+        return acc;
     }
 }
