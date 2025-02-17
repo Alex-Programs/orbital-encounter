@@ -5,6 +5,8 @@ public class KeplerOrchestrator : MonoBehaviour
 {
     public KeplerPredictor keplerPredictor;
     public CelestialTimeService timeService;
+    public Material celestialBodyMaterial;  // New public material reference
+    
     private Dictionary<KeplerPredictor.CelestialBody, GameObject> bodyObjects = new Dictionary<KeplerPredictor.CelestialBody, GameObject>();
 
     void Start()
@@ -14,9 +16,16 @@ public class KeplerOrchestrator : MonoBehaviour
             Debug.LogError("KeplerPredictor not assigned to KeplerOrchestrator.");
             return;
         }
+        
         if (timeService == null)
         {
             Debug.LogError("CelestialTimeService not assigned to KeplerOrchestrator.");
+            return;
+        }
+
+        if (celestialBodyMaterial == null)
+        {
+            Debug.LogError("Celestial Body Material not assigned to KeplerOrchestrator.");
             return;
         }
 
@@ -24,13 +33,12 @@ public class KeplerOrchestrator : MonoBehaviour
         {
             GameObject bodyObject = GameObject.CreatePrimitive(PrimitiveType.Sphere);
             bodyObject.name = body.name;
-            // Diameter = 2 * radius.
             bodyObject.transform.localScale = Vector3.one * body.radius * 2;
-            // Parent under this orchestrator in the hierarchy.
             bodyObject.transform.SetParent(transform, false);
 
             var renderer = bodyObject.GetComponent<Renderer>();
-            renderer.material = new Material(Shader.Find("Standard"));
+            renderer.material = new Material(celestialBodyMaterial);  // Create instance of the material
+
             if (ColorUtility.TryParseHtmlString(body.colorHex, out Color color))
             {
                 renderer.material.color = color;
