@@ -53,7 +53,7 @@ public class KeplerOrchestrator : MonoBehaviour
         {
             if (bodyObjects.TryGetValue(body, out GameObject bodyObject))
             {
-                bodyObject.transform.position = keplerPredictor.GetKeplerPosition(body, timestep);
+                bodyObject.transform.position = keplerPredictor.GetKeplerPosition(body, timestep, (float)timeService.GetCelestialTimeResolution());
             }
         }
     }

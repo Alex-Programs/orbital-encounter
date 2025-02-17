@@ -51,7 +51,7 @@ public class KeplerPredictor : MonoBehaviour
         bodies.Add(moon2);
     }
 
-    public Vector3 GetKeplerPosition(CelestialBody body, float timestep)
+    public Vector3 GetKeplerPosition(CelestialBody body, float timestep, float resolution)
     {
         // For bodies with no parent (sun), assume fixed at zero.
         if (body.parent == null)
@@ -62,8 +62,8 @@ public class KeplerPredictor : MonoBehaviour
         // Mean motion: n = sqrt(M_parent / a^3) [G=1 assumed]
         float n = Mathf.Sqrt(body.parent.mass / (a * a * a));
 
-        // Convert timestep (ms) to seconds
-        float t = timestep * speedScale / 1000f;
+        // Account for speed scale and resolution
+        float t = timestep * speedScale / resolution;
         // Mean anomaly: M = n * t (wrap to [0,2π])
         float M = n * t % (2 * Mathf.PI);
         float E = SolveKepler(M, body.eccentricity);
@@ -73,7 +73,7 @@ public class KeplerPredictor : MonoBehaviour
         float r = a * (1 - body.eccentricity * Mathf.Cos(E));
         Vector3 localPos = new Vector3(Mathf.Cos(trueAnomaly) * r, 0, Mathf.Sin(trueAnomaly) * r);
         // Parent's position is added recursively.
-        return localPos + GetKeplerPosition(body.parent, timestep);
+        return localPos + GetKeplerPosition(body.parent, timestep, resolution);
     }
 
     private float SolveKepler(float M, float e, int iterations = 5)
