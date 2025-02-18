@@ -1,20 +1,21 @@
 using UnityEngine;
+using Mirror;
 
 public class CelestialTimeService : MonoBehaviour
 {
-    private float startTime;
+    private double startTime;
 
     public int resolution;
     public int multiplier;
 
     void Start()
     {
-        startTime = Time.time;
+        startTime = NetworkTime.time;
     }
 
     public int GetCelestialTime()
     {
-        return (int)((Time.time - startTime) * resolution * multiplier);
+        return (int)((NetworkTime.time - startTime) * resolution * multiplier);
     }
 
     public int GetCelestialTimeResolution() {

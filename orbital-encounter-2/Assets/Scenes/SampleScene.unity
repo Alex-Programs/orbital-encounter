@@ -205,13 +205,13 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 330585543}
   serializedVersion: 2
-  m_LocalRotation: {x: 0.7071068, y: -0, z: -0, w: 0.7071068}
-  m_LocalPosition: {x: 0, y: 221, z: 0}
+  m_LocalRotation: {x: 0.44409811, y: -0, z: -0, w: 0.89597815}
+  m_LocalPosition: {x: 0, y: 588, z: -400}
   m_LocalScale: {x: 0.5, y: 0.5, z: 0.5}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 1111008495}
-  m_LocalEulerAnglesHint: {x: 90, y: 0, z: 0}
+  m_LocalEulerAnglesHint: {x: 52.731, y: 0, z: 0}
 --- !u!114 &330585547
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -337,7 +337,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   timeService: {fileID: 1046980976}
   nBodyPredictor: {fileID: 1100315663}
-  lookaheadDistance: 6000
+  lookaheadDistance: 30000
+  lookaheadSteps: 1000
 --- !u!4 &758631590
 Transform:
   m_ObjectHideFlags: 0
@@ -494,7 +495,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8cb60b49d9a074eee8ab0b0b4c5fae0e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  resolution: 250
+  resolution: 200
   multiplier: 1
 --- !u!1 &1100315662
 GameObject:
@@ -710,7 +711,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7a463484f2a5aeecbb09255f483e8f8f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  screenSize: 0.1
+  screenSizeFactor: 0.0005
   minScale: 0.01
   maxScale: 10
 --- !u!4 &1642654797
@@ -761,7 +762,7 @@ MonoBehaviour:
   trackManager: {fileID: 758631589}
   dottedLineDrawer: {fileID: 1642654796}
   dotsTimeInterval: 0.5
-  dotVerticalDistance: 5
+  dotVerticalDistance: 2.5
   friendlyTrackMaterial: {fileID: 2100000, guid: 0f9d664059dcace43b6d01177d35b4d0, type: 2}
 --- !u!4 &1788860852
 Transform:

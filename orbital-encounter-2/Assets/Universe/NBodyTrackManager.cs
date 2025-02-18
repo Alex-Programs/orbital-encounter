@@ -1,5 +1,6 @@
 using UnityEngine;
 using System.Collections.Generic;
+using System;
 
 public class NBodyTrackManager : MonoBehaviour
 {
@@ -7,6 +8,7 @@ public class NBodyTrackManager : MonoBehaviour
     public NBodyPredictor nBodyPredictor;
 
     public int lookaheadDistance = 5000;
+    public int lookaheadSteps = 250;
 
     public struct NBodyTrackPoint {
         public Vector3 position;
@@ -29,7 +31,7 @@ public class NBodyTrackManager : MonoBehaviour
         Vector3 currentPos = initialPosition;
         Vector3 currentVel = initialVelocity;
 
-        for (int i = 0; i < lookaheadDistance; i++) {
+        for (int i = 0; i < lookaheadSteps / 8; i++) {
             trackPoints.Add(new NBodyTrackPoint {
                 position = currentPos,
                 velocity = currentVel,
@@ -79,12 +81,15 @@ public class NBodyTrackManager : MonoBehaviour
             deleteCount++;
         }
 
-        if (deleteCount > 0) {
+        int toFillDelta = Math.Min(lookaheadDistance - trackPoints.Count, lookaheadSteps);
+        int aheadCount = Math.Max(deleteCount, toFillDelta);
+
+        if (aheadCount > 0) {
             Vector3 currentPos = trackPoints[^1].position;
             Vector3 currentVel = trackPoints[^1].velocity;
             int lastTime = trackPoints[^1].timestep;
 
-            for (int i = 0; i < deleteCount; i++) {
+            for (int i = 0; i < aheadCount; i++) {
                 (currentVel, currentPos) = nBodyPredictor.DoTimeStep(currentPos, currentVel, lastTime + i);
                 trackPoints.Add(new NBodyTrackPoint {
                     position = currentPos,
