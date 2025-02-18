@@ -205,13 +205,13 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 330585543}
   serializedVersion: 2
-  m_LocalRotation: {x: 0.44409811, y: -0, z: -0, w: 0.89597815}
-  m_LocalPosition: {x: 0, y: 588, z: -400}
-  m_LocalScale: {x: 0.5, y: 0.5, z: 0.5}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 990, y: 622, z: -1174}
+  m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 1111008495}
-  m_LocalEulerAnglesHint: {x: 52.731, y: 0, z: 0}
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &330585547
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -453,7 +453,7 @@ MonoBehaviour:
   emissionStrength: 4
   dottedLineDrawer: {fileID: 1642654796}
   keplerTrackMaterial: {fileID: 2100000, guid: 7e3a138480136258bad1ed27df9c6e70, type: 2}
-  drawTrackDistance: 30000
+  drawTrackDistance: 60000
   trackDotsTimeInterval: 2.5
   dotsVerticalDistance: 12.5
 --- !u!1 &1046980974
@@ -650,8 +650,7 @@ Transform:
   m_LocalPosition: {x: 1482, y: 0, z: 0}
   m_LocalScale: {x: 2, y: 2, z: 2}
   m_ConstrainProportionsScale: 0
-  m_Children:
-  - {fileID: 330585546}
+  m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1381292660
@@ -917,5 +916,6 @@ SceneRoots:
   - {fileID: 1100315664}
   - {fileID: 1788860852}
   - {fileID: 1642654797}
+  - {fileID: 330585546}
   - {fileID: 758631590}
   - {fileID: 1111008495}

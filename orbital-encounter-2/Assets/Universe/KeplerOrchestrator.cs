@@ -90,7 +90,7 @@ public class KeplerOrchestrator : MonoBehaviour
 
             int i = 0;
             for (int timeStep = currentTime; timeStep < currentTime + drawTrackDistance; timeStep++) {
-                if (timeStep % dotsInterval == 0) {
+                if (i % dotsInterval == 0) {
                     Vector3 pos = keplerPredictor.GetKeplerPosition(body, timeStep, (float)timeService.GetCelestialTimeResolution());
                     pos.y = dotsVerticalDistance * (i / dotsInterval);
                     dotsSubset.Add(pos);
