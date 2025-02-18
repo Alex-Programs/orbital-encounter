@@ -338,7 +338,7 @@ MonoBehaviour:
   timeService: {fileID: 1046980976}
   nBodyPredictor: {fileID: 1100315663}
   lookaheadDistance: 30000
-  lookaheadSteps: 1000
+  lookaheadSteps: 300
 --- !u!4 &758631590
 Transform:
   m_ObjectHideFlags: 0
@@ -451,6 +451,11 @@ MonoBehaviour:
   timeService: {fileID: 1046980976}
   celestialBodyMaterial: {fileID: 2100000, guid: 489938d6b4f3191e18871b60d266bed1, type: 2}
   emissionStrength: 4
+  dottedLineDrawer: {fileID: 1642654796}
+  keplerTrackMaterial: {fileID: 2100000, guid: 7e3a138480136258bad1ed27df9c6e70, type: 2}
+  drawTrackDistance: 30000
+  trackDotsTimeInterval: 2.5
+  dotsVerticalDistance: 12.5
 --- !u!1 &1046980974
 GameObject:
   m_ObjectHideFlags: 0

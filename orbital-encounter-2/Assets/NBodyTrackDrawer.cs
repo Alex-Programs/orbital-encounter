@@ -36,7 +36,7 @@ public class NBodyTrackDrawer : MonoBehaviour
 
             Debug.Log($"Drawing {dotsSubset.Count} dots");
 
-            dottedLineDrawer.DrawDots(friendlyTrackMaterial, dotsSubset, 10.0f);
+            dottedLineDrawer.DrawDots(friendlyTrackMaterial, dotsSubset, 6.0f);
         }
     }
 }

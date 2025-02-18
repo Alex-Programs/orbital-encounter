@@ -10,6 +10,12 @@ public class KeplerOrchestrator : MonoBehaviour
     
     private Dictionary<KeplerPredictor.CelestialBody, GameObject> bodyObjects = new Dictionary<KeplerPredictor.CelestialBody, GameObject>();
 
+    public DottedLineDrawer dottedLineDrawer;
+    public Material keplerTrackMaterial;
+    public int drawTrackDistance;
+    public float trackDotsTimeInterval;
+    public float dotsVerticalDistance;
+
     void Start()
     {
         if (keplerPredictor == null)
@@ -68,6 +74,30 @@ public class KeplerOrchestrator : MonoBehaviour
             {
                 bodyObject.transform.position = keplerPredictor.GetKeplerPosition(body, timestep, (float)timeService.GetCelestialTimeResolution());
             }
+        }
+
+        DrawTracks();
+    }
+
+    void DrawTracks() {
+        int startTime = timeService.GetCelestialTime();
+
+        foreach (var body in keplerPredictor.bodies) {
+            List<Vector3> dotsSubset = new List<Vector3>();
+
+            int dotsInterval = (int)(trackDotsTimeInterval * (float)timeService.GetCelestialTimeResolution());
+            int goTo = startTime + drawTrackDistance;
+
+            for (int j = dotsInterval + startTime; j < goTo; j++) {
+                if (j % dotsInterval == 0) {
+                    Vector3 pos = keplerPredictor.GetKeplerPosition(body, j, (float)timeService.GetCelestialTimeResolution());
+                    pos.y = dotsVerticalDistance * ((j - startTime) / dotsInterval);
+
+                    dotsSubset.Add(pos);
+                }
+            }
+
+            dottedLineDrawer.DrawDots(keplerTrackMaterial, dotsSubset, 6.0f);
         }
     }
 }
