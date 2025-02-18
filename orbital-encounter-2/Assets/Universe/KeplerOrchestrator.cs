@@ -7,7 +7,7 @@ public class KeplerOrchestrator : MonoBehaviour
     public CelestialTimeService timeService;
     public Material celestialBodyMaterial;
     public float emissionStrength = 1.0f;  // New emission strength parameter
-    
+
     private Dictionary<KeplerPredictor.CelestialBody, GameObject> bodyObjects = new Dictionary<KeplerPredictor.CelestialBody, GameObject>();
 
     public DottedLineDrawer dottedLineDrawer;
@@ -23,7 +23,7 @@ public class KeplerOrchestrator : MonoBehaviour
             Debug.LogError("KeplerPredictor not assigned to KeplerOrchestrator.");
             return;
         }
-        
+
         if (timeService == null)
         {
             Debug.LogError("CelestialTimeService not assigned to KeplerOrchestrator.");
@@ -79,23 +79,27 @@ public class KeplerOrchestrator : MonoBehaviour
         DrawTracks();
     }
 
-    void DrawTracks() {
-        int startTime = timeService.GetCelestialTime();
+    void DrawTracks()
+    {
+        int currentTime = timeService.GetCelestialTime();
+        int dotsInterval = (int)(trackDotsTimeInterval * (float)timeService.GetCelestialTimeResolution());
 
-        foreach (var body in keplerPredictor.bodies) {
+        foreach (var body in keplerPredictor.bodies)
+        {
             List<Vector3> dotsSubset = new List<Vector3>();
 
-            int dotsInterval = (int)(trackDotsTimeInterval * (float)timeService.GetCelestialTimeResolution());
-            int goTo = startTime + drawTrackDistance;
-
-            for (int j = dotsInterval + startTime; j < goTo; j++) {
-                if (j % dotsInterval == 0) {
-                    Vector3 pos = keplerPredictor.GetKeplerPosition(body, j, (float)timeService.GetCelestialTimeResolution());
-                    pos.y = dotsVerticalDistance * ((j - startTime) / dotsInterval);
-
+            int i = 0;
+            for (int timeStep = currentTime; timeStep < currentTime + drawTrackDistance; timeStep++) {
+                if (timeStep % dotsInterval == 0) {
+                    Vector3 pos = keplerPredictor.GetKeplerPosition(body, timeStep, (float)timeService.GetCelestialTimeResolution());
+                    pos.y = dotsVerticalDistance * (i / dotsInterval);
                     dotsSubset.Add(pos);
                 }
+
+                i++;
             }
+
+            Debug.Log($"Drawing {dotsSubset.Count} dots");
 
             dottedLineDrawer.DrawDots(keplerTrackMaterial, dotsSubset, 6.0f);
         }

@@ -47,7 +47,6 @@ public class DottedLineDrawer : MonoBehaviour
                 // Calculate distance-based scale
                 float distance = Vector3.Distance(point, camPos);
                 float scale = cmd.baseSize * screenSizeFactor * distance;
-                Debug.Log($"Scale: {scale}");
                 
                 scale = Mathf.Clamp(scale, minScale, maxScale);
 
